@@ -1,0 +1,29 @@
+@startuml
+'https://plantuml.com/class-diagram
+allowmixing
+hide empty members
+
+interface AccessTokenService
+class PublicOrderNotificationsClient
+class StompMerchantNotificationsSessionHandler
+class Notification
+interface OrdersAPIClient
+interface CatalogAPIClient
+interface OrderService
+queue OrderProcessingQueue
+interface OrderEventListener
+
+CatalogAPIClient -- AccessTokenService
+AccessTokenService -- PublicOrderNotificationsClient
+PublicOrderNotificationsClient - StompMerchantNotificationsSessionHandler
+StompMerchantNotificationsSessionHandler - OrderProcessingQueue
+(StompMerchantNotificationsSessionHandler, OrderProcessingQueue) .. Notification
+
+OrderProcessingQueue - OrderEventListener
+(OrderProcessingQueue, OrderEventListener) .. Notification
+OrderEventListener - OrderService
+OrderService - OrdersAPIClient
+OrderService -- OrderDataRepository
+AccessTokenService - OrdersAPIClient
+
+@enduml

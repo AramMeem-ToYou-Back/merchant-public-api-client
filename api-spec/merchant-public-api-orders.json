@@ -1,0 +1,465 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ToYou's public API:  Orders",
+    "description": "Allows to get notified about new orders, order status changes and retrieve order details.<br/> As soon as a driver has been assigned to the order, it becomes available to retrieve by 3rd party. It means that driver is already on the way to pickup the order. The status of the order will change during the delivery. ToYou provides the information on each status change of the delivery",
+    "version": "1-oas3"
+  },
+  "servers": [
+    {
+      "url": "https://sand.toyou.delivery/publicorders",
+      "description": "Public Orders API"
+    }
+  ],
+  "tags": [
+    {
+      "name": "orders-resource",
+      "description": "Manage orders"
+    }
+  ],
+  "paths": {
+    "/v1/orders/{order-id}": {
+      "get": {
+        "tags": [
+          "orders-resource"
+        ],
+        "summary": "Get Order data by ID",
+        "description": "Use Order ID from order change data to get Order details",
+        "operationId": "orderByIdByUsingGET",
+        "parameters": [
+          {
+            "name": "order-id",
+            "in": "path",
+            "description": "Order ID",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderData"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/orders": {
+      "get": {
+        "tags": [
+          "orders-resource"
+        ],
+        "summary": "Get Order change data by date time period",
+        "description": "Search the orders created or with the changed status within the date time interval.",
+        "operationId": "orderListByUsingGET",
+        "parameters": [
+          {
+            "name": "from-date-time",
+            "in": "query",
+            "description": "RFC3339 date-time",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to-date-time",
+            "in": "query",
+            "description": "RFC3339 date-time",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderChangeData"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/orders/{order-id}/failed": {
+      "post": {
+        "tags": [
+          "orders-resource"
+        ],
+        "summary": "Set Order as Failed",
+        "description": "ToYou API does not support the order cancellation. If 3rd party system is unable to create the retrieved order it should set it as Failed. Failed orders appear on Merchant Portal/Failed orders page in ToYou system",
+        "operationId": "setOrderFailedUsingPUT",
+        "parameters": [
+          {
+            "name": "order-id",
+            "in": "path",
+            "description": "Order ID",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "failure-reason",
+            "in": "query",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "OrderData": {
+        "title": "Order details data",
+        "required": [
+          "creationDate",
+          "currency",
+          "deliveryStatus",
+          "estimatedPickupDate",
+          "lang",
+          "merchantPosID",
+          "orderId",
+          "orderNumber",
+          "orderTotal",
+          "paymentType"
+        ],
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "Unique order ID in ToYou system",
+            "format": "uuid"
+          },
+          "orderNumber": {
+            "type": "string",
+            "description": "Unique human readable order number",
+            "format": "in32",
+            "example": "450456"
+          },
+          "lang": {
+            "type": "string",
+            "description": "“en” or “ar”. The language in which the order has been created",
+            "example": "en"
+          },
+          "currency": {
+            "type": "string",
+            "description": "order total currency. Always in SAR",
+            "example": "SAR"
+          },
+          "orderTotal": {
+            "$ref": "#/components/schemas/OrderData_orderTotal"
+          },
+          "estimatedPickupDate": {
+            "type": "string",
+            "description": "Estimated Date and time when driver will arrive at pick up location",
+            "format": "date-time",
+            "example": "2021-06-30T08:23:49.692Z"
+          },
+          "creationDate": {
+            "type": "string",
+            "description": "Date and time of order creation in ToYou system",
+            "format": "date-time",
+            "example": "2021-06-30T08:23:49.692Z"
+          },
+          "paymentType": {
+            "type": "string",
+            "description": "Credit: payments in Cash<br>Card: payments by Credit Card",
+            "example": "Credit"
+          },
+          "deliveryStatus": {
+            "type": "string",
+            "description": "Order's current delivery status",
+            "example": "AT PICK UP"
+          },
+          "pickupLocation": {
+            "$ref": "#/components/schemas/OrderData_pickupLocation"
+          },
+          "merchantPosID": {
+            "type": "string",
+            "description": "Merchant's Point of Sale ID in ToYou system",
+            "format": "uuid"
+          },
+          "orderLines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Order line with Product"
+            }
+          },
+          "driver": {
+            "$ref": "#/components/schemas/OrderData_driver"
+          }
+        }
+      },
+      "OrderChangeDataList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/OrderChangeData"
+        }
+      },
+      "OrderChangeData": {
+        "title": "Order change data",
+        "required": [
+          "dateUpdated",
+          "deliveryStatus",
+          "orderId"
+        ],
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "Unique order ID in ToYou system",
+            "format": "uuid"
+          },
+          "deliveryStatus": {
+            "type": "string",
+            "description": "The status of order delivery flow in ToYou",
+            "example": "ON THE WAY TO PICK UP"
+          },
+          "dateUpdated": {
+            "type": "string",
+            "description": "The date of the status change",
+            "format": "date-time",
+            "example": "2021-06-30T08:23:49.692Z"
+          }
+        }
+      },
+      "OrderData_orderTotal": {
+        "type": "object",
+        "properties": {
+          "basketVAT": {
+            "type": "number",
+            "description": "VAT amount calculated from Basket total amount"
+          },
+          "total": {
+            "type": "number",
+            "description": "Total basket amount including VAT"
+          }
+        }
+      },
+      "OrderData_pickupLocation_geopoint": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number"
+          },
+          "lon": {
+            "type": "number"
+          }
+        }
+      },
+      "OrderData_pickupLocation": {
+        "type": "object",
+        "properties": {
+          "formattedAddress": {
+            "type": "string"
+          },
+          "addressLine1": {
+            "type": "string"
+          },
+          "addressLine2": {
+            "type": "string"
+          },
+          "area": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "zip": {
+            "type": "string"
+          },
+          "geopoint": {
+            "$ref": "#/components/schemas/OrderData_pickupLocation_geopoint"
+          }
+        },
+        "description": "Location to pick up the order by driver"
+      },
+      "Option value ordered with Product": {
+        "required": [
+          "optionId",
+          "optionName",
+          "optionValueId",
+          "optionValueName",
+          "optionValuePrice",
+          "quantity"
+        ],
+        "type": "object",
+        "properties": {
+          "optionValueId": {
+            "type": "integer",
+            "description": "Product option value’s unique ID in ToYou system"
+          },
+          "optionId": {
+            "type": "integer",
+            "description": "Product option’s  unique ID in ToYou system"
+          },
+          "optionName": {
+            "type": "string",
+            "description": "Option name of selected option values in selected language (en or ar)"
+          },
+          "optionValueName": {
+            "type": "string",
+            "description": "Option value name of selected option values in selected language (en or ar)"
+          },
+          "optionValuePrice": {
+            "type": "number",
+            "description": "Option value price (tax exclusive)"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Number of option values ordered"
+          }
+        }
+      },
+      "Order line with Product": {
+        "required": [
+          "name",
+          "note",
+          "orderId",
+          "price",
+          "productId",
+          "quantity"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Product name in selected language (en or ar)"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Number of products ordered"
+          },
+          "price": {
+            "type": "number",
+            "description": "Product's price (tax exclusive)"
+          },
+          "note": {
+            "type": "string",
+            "description": "Ordered item note from Customer"
+          },
+          "productId": {
+            "type": "string",
+            "description": "Product’s unique ID in ToYou system",
+            "format": "uuid"
+          },
+          "productOptionsValues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Option value ordered with Product"
+            }
+          }
+        }
+      },
+      "OrderData_driver": {
+        "required": [
+          "driverFirstName",
+          "driverLastName",
+          "phone"
+        ],
+        "type": "object",
+        "properties": {
+          "driverFirstName": {
+            "type": "string"
+          },
+          "driverLastName": {
+            "type": "string"
+          },
+          "driverFirstNameNative": {
+            "type": "string"
+          },
+          "driverLastNameNative": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

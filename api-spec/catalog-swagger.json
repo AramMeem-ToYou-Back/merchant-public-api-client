@@ -1,0 +1,157 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Api Documentation",
+    "version": "1.0",
+    "title": "Api Documentation",
+    "termsOfService": "urn:tos",
+    "contact": {},
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "host": "https://sand.toyou.delivery",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "merchant-user-resource",
+      "description": "Merchant User Resource"
+    }
+  ],
+  "paths": {
+    "/catalog/v1/merchantuser/authtoken": {
+      "get": {
+        "tags": [
+          "merchant-user-resource"
+        ],
+        "summary": "Get refreshed tokens",
+        "operationId": "getTokensUsingGET",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Refresh token",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AuthTokensDto"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "merchant-user-resource"
+        ],
+        "summary": "Generate tokens for existing merchant user by email and password",
+        "operationId": "getTokensUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "loginDataDto",
+            "description": "Login data object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginData"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AuthTokensDto"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "LoginData": {
+      "type": "object",
+      "required": [
+        "email",
+        "password"
+      ],
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "User email"
+        },
+        "password": {
+          "type": "string",
+          "description": "Password"
+        }
+      }
+    },
+    "AuthTokensDto": {
+      "type": "object",
+      "required": [
+        "authExpirationDate",
+        "authExpirationPeriod",
+        "authToken",
+        "refreshExpirationDate",
+        "refreshExpirationPeriod",
+        "refreshToken"
+      ],
+      "properties": {
+        "authExpirationDate": {
+          "type": "integer",
+          "format": "int32",
+          "description": "AuthToken Expiration time. Expressed in seconds that have elapsed since epoch."
+        },
+        "authExpirationPeriod": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Time left until AuthToken expires. Expressed in seconds."
+        },
+        "authToken": {
+          "type": "string",
+          "description": "A JSON Web token intended for user authorization needs."
+        },
+        "refreshExpirationDate": {
+          "type": "integer",
+          "format": "int32",
+          "description": "RefreshToken Expiration time. Expressed in seconds that have elapsed since epoch."
+        },
+        "refreshExpirationPeriod": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Time left until RefreshToken expires. Expressed in seconds."
+        },
+        "refreshToken": {
+          "type": "string",
+          "description": "A JSON Web token intended for authorization token refreshing."
+        }
+      }
+    }
+  }
+}

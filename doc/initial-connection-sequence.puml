@@ -1,0 +1,29 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+'autonumber
+participant PublicOrderNotificationsClient
+participant AccessTokenService
+participant NotificationSessionHandler
+participant OrdersService
+participant OrdersAPIClient
+queue OrderProcessingQueue
+participant OrderProcessor
+
+PublicOrderNotificationsClient -> AccessTokenService : getToken
+== Public Orders fetching ==
+PublicOrderNotificationsClient -> NotificationSessionHandler : onConnect
+NotificationSessionHandler -> OrdersService ++ : getCurrentOrders
+OrdersService -> OrdersAPIClient : getCurrentOrders
+OrdersService -> OrderProcessingQueue -- : submitOrders
+loop
+    PublicOrderNotificationsClient -> NotificationSessionHandler : onMessage
+    NotificationSessionHandler -> OrderProcessingQueue : submitOrder
+end
+
+== Public Orders processing ==
+OrderProcessor -> OrderProcessingQueue : getOrder
+OrderProcessor -> OrdersService : getOrderDetails
+OrdersService -> OrdersAPIClient : getOrder
+OrderProcessor -> OrderDataRepository : saveOrderDetails
+@enduml

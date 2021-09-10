@@ -1,0 +1,23 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+title AccessTokenService activity
+
+start
+:AccessTokenService.getToken();
+if (tokenDTO exists) then (yes)
+    if (token expired) then (no)
+        :return token;
+        stop
+    else (yes)
+        :CatalogAPIClient.refreshToken();
+        :return token;
+        stop
+    endif
+endif
+:CatalogAPIClient.login();
+:save tokenDTO;
+:return token;
+
+stop
+
+@enduml

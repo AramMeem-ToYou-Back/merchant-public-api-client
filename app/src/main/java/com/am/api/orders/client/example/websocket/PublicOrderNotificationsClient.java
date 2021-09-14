@@ -48,7 +48,7 @@ public class PublicOrderNotificationsClient {
         this.accessTokenService = accessTokenService;
         this.merchantId = merchantId;
         this.applicationEventPublisher = applicationEventPublisher;
-        basePath = String.format("%s://%s:%d/publicorders/ws?access_token=",
+        basePath = String.format("%s://%s:%d/publicwebsocket/ws?access_token=",
                 "https".equals(protocol) ? "wss" : "ws", host, port);
     }
 

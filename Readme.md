@@ -1,7 +1,7 @@
-# Java client for ToYou Public API
+# Java client for ToYou Integration API
 
-This sample client to ToYou Public API aimed at helping merchants and third-party developers 
-to better understand how the Public API works and how they should use it to integrate their systems with ToYou.
+This sample client to ToYou Integration API aimed at helping merchants and third-party developers 
+to better understand how the Integration API works and how they should use it to integrate their systems with ToYou.
 
 ## Project structure
 
